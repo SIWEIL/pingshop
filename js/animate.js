@@ -8,9 +8,7 @@ function animate(obj, target, callback){
         if(obj.offsetLeft == target){
             // 停止定时器，停止动画
             clearInterval(obj.timer);
-            if(callback){
-                callback();
-            }
+            callback && callback();
         }
         obj.style.left = obj.offsetLeft + step + 'px';
     }, 15);

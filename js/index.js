@@ -9,10 +9,15 @@ window.addEventListener('load', function(){
     focus.addEventListener('mouseenter', function(){
         arrow_l.style.display = 'block';
         arrow_r.style.display = 'block';
+        clearInterval(timer);
+        timer = null;
     });
     focus.addEventListener('mouseleave', function(){
         arrow_l.style.display = 'none';
         arrow_r.style.display = 'none';
+        timer = setInterval(function(){
+            arrow_r.click();
+        }, 3000);
     });
     // 动态生成小圆点
     var ul = focus.querySelector('ul');
@@ -42,23 +47,44 @@ window.addEventListener('load', function(){
     // 点击按钮图片滚动
     var num = 0;
     var circle = 0;
+    // flag 节流阀
+    var flag = true;
     arrow_r.addEventListener('click', function(){
-        if(num == ul.children.length - 1){
+        if(flag){
+            flag = false;
+            if(num == ul.children.length - 1){
             ul.style.left = 0;
             num = 0;
+            }
         }
         num++;
-        animate(ul, -num * focusWidth);
+        animate(ul, -num * focusWidth, function(){
+            // 打开节流阀
+            flag = true;
+        });
         circle++;
-        if(circle == ol.children.length){
-            circle = 0;
-        }
-        for(var i = 0; i < ol.children.length; i++){
-            ol.children[i].className = "";
-        }
-        ol.children[circle].className = 'current';
+        circle = circle == ol.children.length ? 0 : circle;
+        circleChange();
     })
     
+    arrow_l.addEventListener('click', function(){
+        if(flag){
+            flag = false;
+            if(num == ul.children.length - 1){
+            num = ul.children.length - 1;
+            ul.style.left = -num * focusWidth + "px";
+            
+            }
+        }     
+        num--;
+        animate(ul, -num * focusWidth, function(){
+            flag = true;
+        });
+        circle--;
+        circle = circke < 0 ? ol.children.length - 1 : circle;
+        circleChange();
+    })
+
 
     // 精灵图使用
     var lifeservice = document.querySelector(".lifeservice");
@@ -69,6 +95,18 @@ window.addEventListener('load', function(){
         
         lis[i].querySelector("i").style.backgroundPosition = '0 -' + index + 'px';
     }
+
+    function circleChange(){
+        for(var i = 0; i < ol.children.length; i++){
+            ol.children[i].className = "";
+        }
+        ol.children[circle].className = 'current';
+    }
+
+    // 自动播放
+    var timer = setInterval(function(){
+        arrow_r.click();
+    }, 3000);
 })
 
 
